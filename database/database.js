@@ -12,7 +12,7 @@ export const db = new Pool({
 
 try {
   const res = await db.query('select now()')
-  console.log(res, 'contected');
+  console.log(res.rows[0], 'contected');
   
 } catch (error) {
   console.error(error);
