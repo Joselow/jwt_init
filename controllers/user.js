@@ -10,12 +10,12 @@ const register = async (req, res) => {
     const accountExist = await userModel.existsAccountByMail(email)
     
     if (accountExist) {
-      return res.json({ ok: false, message: 'Email already has an account'})
+      return res.json({ ok: false, message: 'The email already has an account'})
     }
     const passwordHashed = await hashData(password)
 
-    const { uid } = await userModel.create({ email, password: passwordHashed, username })
-    const userCreated = { uid, username, email }
+    const { uid, role_id } = await userModel.create({ email, password: passwordHashed, username })
+    const userCreated = { uid, username, email, role_id }
     console.log(userCreated);
 
     const token = generateToken(userCreated)
@@ -41,15 +41,20 @@ const login = async(req, res) => {
   try {
     const { email, password } = req.body
 
-    const user = await userModel.getUserByEMail(email)
+    const user = await userModel.getUserByEmail(email)
     if (!user) {
       return res.status(404).json({ ok: false, message: 'Invalid credentials'})
     }
 
-console.log(user);
+    console.log(user);
 
     const isPasswordValid = await comparePasswordHashed(password, user.password);
-    const token = generateToken({ uid: user.uid, email: user.email, username: user.username })
+    const token = generateToken({ 
+      uid: user.uid, 
+      email: user.email, 
+      username: user.username ,
+      role_id: user.role_id
+    })
 
     if (isPasswordValid) {
       return responseSuccess({
@@ -73,7 +78,7 @@ const getProfile = async (req, res) => {
   const { email } = req.body
 
   try {
-    const user = await userModel.getUserByEMail(email)
+    const user = await userModel.getUserByEmail(email)
     responseSuccess({
       res, data: { email: user.email, username: user.username, uid: user.uid}
     })

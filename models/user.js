@@ -2,7 +2,7 @@ import { db } from "../database/database.js";
 
 const create = async ({ email, password, username }) => {
   const query = {
-    text: `INSERT INTO USERS(email, password, username) VALUES ($1, $2, $3) RETURNING uid`,
+    text: `INSERT INTO USERS(email, password, username) VALUES ($1, $2, $3) RETURNING uid, role_id`,
     values: [email, password, username],
   }
 
@@ -22,7 +22,7 @@ const existsAccountByMail = async (email) => {
 }
 
 
-const getUserByEMail = async (email) => {
+const getUserByEmail = async (email) => {
   const query = {
     text: `SELECT * FROM USERS WHERE email = $1`,
     values: [email]
@@ -34,12 +34,12 @@ const getUserByEMail = async (email) => {
 
 const getUsers = async() => {
   const query = {
-    text: `SELECT * FROM USERS`,
+    text: `SELECT uid, email, username, role_id, created_at, updated_at FROM USERS`,
   }
   const { rows } = await db.query(query)
   return rows
 }
 
 export const userModel = {
-  create, existsAccountByMail, getUserByEMail, getUsers
+  create, existsAccountByMail, getUserByEmail, getUsers
 }
